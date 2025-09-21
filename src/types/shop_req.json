@@ -1,0 +1,9 @@
+{
+  "headers": { "Cookie": "jwt=<token>" },
+  "body": {
+    "name": "ヘアサロン花",
+    "location": "東京都渋谷区1-2-3",
+    "strengths": "カラーが得意, メンズカット",
+    "services": "カット, カラー, パーマ"
+  }
+}

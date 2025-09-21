@@ -1,0 +1,14 @@
+{
+  "success_example": {
+    "salon_id": "123e4567-e89b-12d3-a456-426614174000",
+    "name": "ヘアサロン花",
+    "location": "東京都渋谷区1-2-3",
+    "strengths": "カラーが得意, メンズカット",
+    "services": "カット, カラー, パーマ",
+    "created_at": "2025-09-21T10:00:00Z"
+  },
+  "error_example": {
+    "error": "NotFound",
+    "message": "店舗情報が登録されていません"
+  }
+}

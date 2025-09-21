@@ -1,0 +1,21 @@
+{
+  "results": [
+    {
+      "channel": "instagram",
+      "outputs": [
+        {
+          "text": "秋のカラーでイメチェンしませんか？今なら10%OFF！渋谷駅近くでお待ちしています",
+          "hashtags": ["#秋カラー", "#渋谷美容室", "#イメチェン"]
+        }
+      ]
+    },
+    {
+      "channel": "line",
+      "outputs": [
+        {
+          "text": "【秋カラーキャンペーン】今なら10%OFF\nご予約はこちら https://example.com"
+        }
+      ]
+    }
+  ]
+}
