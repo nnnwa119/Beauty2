@@ -43,11 +43,37 @@ export const SalonInfoForm: React.FC<SalonInfoFormProps> = ({ onComplete }) => {
     setError('');
     setIsLoading(true);
 
+    console.log('💾 Saving salon info:', salonInfo);
+
     try {
       await apiClient.updateSalonInfo(salonInfo);
+      console.log('✅ Salon info saved successfully');
       onComplete();
     } catch (err) {
-      setError('店舗情報の保存に失敗しました');
+      console.error('❌ Failed to save salon info:', err);
+      
+      let errorMessage = '店舗情報の保存に失敗しました';
+      let debugInfo = '';
+      
+      if (err instanceof Error) {
+        try {
+          const errorData = JSON.parse(err.message);
+          debugInfo = JSON.stringify(errorData, null, 2);
+          
+          if (errorData.response?.data?.message) {
+            errorMessage = `保存失敗: ${errorData.response.data.message}`;
+          } else if (errorData.response?.status === 401) {
+            errorMessage = '認証エラー: ログインし直してください';
+          } else if (errorData.response?.status) {
+            errorMessage = `サーバーエラー (${errorData.response.status}): ${errorData.response.statusText}`;
+          }
+        } catch {
+          errorMessage = `保存失敗: ${err.message}`;
+          debugInfo = err.message;
+        }
+      }
+      
+      setError(`${errorMessage}\n\nデバッグ情報:\n${debugInfo}`);
     } finally {
       setIsLoading(false);
     }

@@ -30,9 +30,10 @@ class ApiClient {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      // credentials: 'include' を確実に設定するため、optionsとは別に明示的に設定
+      const requestOptions: RequestInit = {
+        ...options,
         method: options.method || 'GET',
-        body: options.body,
         credentials: 'include', // httpOnly Cookieを含める（必須）
         signal: controller.signal,
         headers: {
@@ -40,22 +41,46 @@ class ApiClient {
           'ngrok-skip-browser-warning': 'true', // ngrokの警告をスキップ
           ...options.headers,
         },
-        ...options, // その他のオプションを最後に適用（credentialsを上書きしないように）
+      };
+
+      console.log('🚀 API Request:', {
+        url: `${API_BASE_URL}${endpoint}`,
+        method: requestOptions.method,
+        credentials: requestOptions.credentials,
+        headers: requestOptions.headers,
+        body: options.body,
+        timestamp: new Date().toISOString()
+      });
+
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...requestOptions
       });
 
       clearTimeout(timeoutId);
       
       const data = await response.json();
       
+      console.log('📥 API Response:', {
+        url: `${API_BASE_URL}${endpoint}`,
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        data,
+        timestamp: new Date().toISOString()
+      });
+      
       if (!response.ok) {
         const errorInfo = {
           ...requestInfo,
+          requestOptions,
           response: {
             status: response.status,
             statusText: response.statusText,
+            headers: Object.fromEntries(response.headers.entries()),
             data
           }
         };
+        console.error('❌ API Error:', errorInfo);
         throw new Error(JSON.stringify(errorInfo));
       }
       
@@ -64,6 +89,7 @@ class ApiClient {
       clearTimeout(timeoutId);
       
       if (error.name === 'AbortError') {
+        console.error('⏰ API Timeout:', { endpoint, timeout });
         throw new Error(`タイムアウト: ${endpoint} (${timeout/1000}秒)`);
       }
       
@@ -75,9 +101,11 @@ class ApiClient {
           message: 'サーバーに接続できません。APIのURLを確認してください。',
           originalError: error.message
         };
+        console.error('🌐 Network Error:', networkError);
         throw new Error(JSON.stringify(networkError));
       }
       
+      console.error('💥 Unexpected Error:', error);
       throw error;
     }
   }

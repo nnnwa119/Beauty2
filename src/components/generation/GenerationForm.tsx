@@ -49,6 +49,14 @@ export const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate }) =>
     setIsGenerating(true);
 
     try {
+      console.log('🎨 Generating posts with params:', {
+        context,
+        channels: selectedChannels,
+        tone: selectedTone,
+        hints,
+        ask_ai: askAi,
+      });
+
       const response = await apiClient.generatePosts({
         context,
         channels: selectedChannels,
@@ -58,19 +66,55 @@ export const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate }) =>
       });
       
       if (response.results) {
+        console.log('✅ Posts generated successfully:', response.results);
         onGenerate(response.results);
       } else {
         throw new Error('投稿の生成に失敗しました');
       }
     } catch (error) {
-      console.error('投稿生成エラー:', error);
+      console.error('❌ Post generation failed:', error);
+      
+      let errorMessage = '投稿生成に失敗しました';
+      let debugInfo = '';
+      
+      if (error instanceof Error) {
+        try {
+          const errorData = JSON.parse(error.message);
+          debugInfo = JSON.stringify(errorData, null, 2);
+          
+          if (errorData.response?.data?.message) {
+            errorMessage = `生成失敗: ${errorData.response.data.message}`;
+          } else if (errorData.response?.status === 401) {
+            errorMessage = '認証エラー: ログインし直してください';
+          } else if (errorData.response?.status === 403) {
+            errorMessage = 'アクセス権限がありません';
+          } else if (errorData.response?.status >= 500) {
+            errorMessage = `サーバーエラー (${errorData.response.status}): サーバーで問題が発生しました`;
+          } else if (errorData.response?.status) {
+            errorMessage = `サーバーエラー (${errorData.response.status}): ${errorData.response.statusText}`;
+          } else if (errorData.error === 'Network Error') {
+            errorMessage = `ネットワークエラー: ${errorData.message}`;
+          }
+        } catch {
+          errorMessage = `生成失敗: ${error.message}`;
+          debugInfo = error.message;
+        }
+      }
+      
+      // より詳細なエラー表示
+      const fullErrorMessage = debugInfo 
+        ? `${errorMessage}\n\nデバッグ情報:\n${debugInfo}`
+        : errorMessage;
+      
+      alert(fullErrorMessage);
+      
       // エラー時はモックデータで代用（開発用）
       const mockResults: GeneratedResult[] = selectedChannels.map(channelId => {
         const channel = CHANNELS.find(c => c.id === channelId);
         return {
           channel: channelId,
           outputs: [{
-            text: `【${channel?.name}用投稿】\n\n${context}\n\n投稿生成サービスをご利用いただきありがとうございます。`,
+            text: `【${channel?.name}用投稿 - テストモード】\n\n${context}\n\n※ APIエラーのため、モックデータを表示しています。`,
             hashtags: channelId === 'instagram' ? ['#美容室', '#ヘアサロン', '#スタイル'] : undefined
           }]
         };
