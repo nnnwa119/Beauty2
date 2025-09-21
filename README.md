@@ -15,7 +15,7 @@ cd beauty-salon-sns-generator
 npm install
 ```
 
-### 3. 環境変数の設定
+### 3. 環境変数の設定cd ..
 ```bash
 cp .env.example .env.local
 # .env.local を編集してAPIのURLを設定

@@ -1,5 +1,13 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
+// デバッグ情報をコンソールに出力
+console.log('API_BASE_URL:', API_BASE_URL);
+console.log('Environment variables:', {
+  VITE_API_URL: import.meta.env.VITE_API_URL,
+  NODE_ENV: import.meta.env.NODE_ENV,
+  MODE: import.meta.env.MODE
+});
+
 // UI上でAPI設定を確認できるよう、windowオブジェクトに設定
 if (typeof window !== 'undefined') {
   (window as any).API_CONFIG = {
@@ -23,13 +31,16 @@ class ApiClient {
 
     try {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        credentials: 'include', // httpOnly Cookieを含める
+        method: options.method || 'GET',
+        body: options.body,
+        credentials: 'include', // httpOnly Cookieを含める（必須）
+        signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true', // ngrokの警告をスキップ
           ...options.headers,
         },
-        signal: controller.signal,
-        ...options,
+        ...options, // その他のオプションを最後に適用（credentialsを上書きしないように）
       });
 
       clearTimeout(timeoutId);
