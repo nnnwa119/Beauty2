@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Header } from '../layout/Header';
 import { SalonInfoForm } from '../salon/SalonInfoForm';
-import { GenerationForm } from '../generation/GenerationForm';
+import { TopicGenerationForm } from '../generation/TopicGenerationForm';
+import { PostGenerationForm } from '../generation/PostGenerationForm';
 import { PostCard } from '../generation/PostCard';
 import { GeneratedResult } from '../../types';
 import { Sparkles } from 'lucide-react';

@@ -10,13 +10,13 @@ interface TopicGenerationFormProps {
 }
 
 const TOPIC_SUGGESTIONS = [
-  { id: 'seasonal', name: '季節ネタ', description: '季節に合わせた投稿内容' },
-  { id: 'current_events', name: '時事ネタ', description: '最新の話題やニュース' },
-  { id: 'trend', name: 'トレンド', description: '流行りのスタイルや技術' },
-  { id: 'middle_aged', name: '中年向け', description: '30-50代向けの内容' },
-  { id: 'elderly', name: '年配向け', description: '50代以上向けの内容' },
-  { id: 'salon_pr', name: '店舗PR重視', description: '店舗の魅力をアピール' },
-  { id: 'daily_talk', name: '日常呟き', description: 'カジュアルな日常の話題' },
+  { id: 'seasonal', name: '季節ネタ' },
+  { id: 'current_events', name: '時事ネタ' },
+  { id: 'trend', name: 'トレンド' },
+  { id: 'middle_aged', name: '中年向け' },
+  { id: 'elderly', name: '年配向け' },
+  { id: 'salon_pr', name: '店舗PR重視' },
+  { id: 'daily_talk', name: '日常呟き' },
 ];
 
 export const TopicGenerationForm: React.FC<TopicGenerationFormProps> = ({ onGenerate, onBackToSalonInfo }) => {
@@ -141,7 +141,6 @@ export const TopicGenerationForm: React.FC<TopicGenerationFormProps> = ({ onGene
                   />
                   <div>
                     <div className="font-medium text-gray-900">{topic.name}</div>
-                    <div className="text-sm text-gray-600">{topic.description}</div>
                   </div>
                 </label>
               </div>
@@ -157,7 +156,6 @@ export const TopicGenerationForm: React.FC<TopicGenerationFormProps> = ({ onGene
                 />
                 <div>
                   <div className="font-medium text-gray-900">選択しない</div>
-                  <div className="text-sm text-gray-600">素案のみで生成</div>
                 </div>
               </label>
             </div>
