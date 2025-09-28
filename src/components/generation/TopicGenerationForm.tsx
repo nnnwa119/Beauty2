@@ -261,7 +261,7 @@ export const TopicGenerationForm: React.FC<TopicGenerationFormProps> = ({ onGene
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="context" className="block text-sm font-medium text-gray-700 mb-2">
-            投稿したいこと、素案
+            投稿したいこと、素案(空欄可)
           </label>
           <textarea
             id="context"

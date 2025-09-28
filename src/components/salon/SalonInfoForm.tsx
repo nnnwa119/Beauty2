@@ -96,7 +96,10 @@ export const SalonInfoForm: React.FC<SalonInfoFormProps> = ({ onComplete }) => {
       <Card>
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">店舗情報</h2>
-          <p className="text-gray-600">投稿生成に必要な店舗情報を入力してください</p>
+          <p className="text-gray-600">
+            投稿生成に必要な店舗情報を入力してください<br />
+            空欄で進むこともできます
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -105,7 +108,6 @@ export const SalonInfoForm: React.FC<SalonInfoFormProps> = ({ onComplete }) => {
             label="店舗名"
             value={salonInfo.name}
             onChange={handleChange('name')}
-            required
             placeholder="例: Hair Salon BEAUTY"
           />
 
@@ -114,7 +116,6 @@ export const SalonInfoForm: React.FC<SalonInfoFormProps> = ({ onComplete }) => {
             label="住所"
             value={salonInfo.location}
             onChange={handleChange('location')}
-            required
             placeholder="例: 東京都渋谷区○○1-2-3"
           />
 
@@ -126,7 +127,6 @@ export const SalonInfoForm: React.FC<SalonInfoFormProps> = ({ onComplete }) => {
               id="strengths"
               value={salonInfo.strengths}
               onChange={handleChange('strengths')}
-              required
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
               placeholder="例: カット・カラーが得意、オーガニック商品使用、個室対応など"
@@ -141,7 +141,6 @@ export const SalonInfoForm: React.FC<SalonInfoFormProps> = ({ onComplete }) => {
               id="services"
               value={salonInfo.services}
               onChange={handleChange('services')}
-              required
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
               placeholder="例: カット、カラー、パーマ、トリートメント、ヘッドスパなど"
