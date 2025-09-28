@@ -49,6 +49,7 @@ class ApiClient {
         credentials: requestOptions.credentials,
         headers: requestOptions.headers,
         body: options.body,
+        cookies: document.cookie,
         timestamp: new Date().toISOString()
       });
 
@@ -138,6 +139,8 @@ class ApiClient {
   }
 
   async generatePosts(params: { context: string; channels: string[]; tone: string; hints: string; ask_ai: string }) {
+  }
+  async generatePosts(params: { context: string; channels: string[]; tone: string; topic_suggestion: string }) {
     return this.request('/generate', {
       method: 'POST',
       body: JSON.stringify(params),

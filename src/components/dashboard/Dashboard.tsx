@@ -33,6 +33,10 @@ export const Dashboard: React.FC = () => {
     setStep('generation');
   };
 
+  const handleBackToSalonInfo = () => {
+    setStep('salon-info');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -44,7 +48,10 @@ export const Dashboard: React.FC = () => {
 
         {step === 'generation' && (
           <div className="max-w-4xl mx-auto px-4">
-            <GenerationForm onGenerate={handleGeneration} />
+            <GenerationForm 
+              onGenerate={handleGeneration} 
+              onBackToSalonInfo={handleBackToSalonInfo}
+            />
           </div>
         )}
 
@@ -65,6 +72,13 @@ export const Dashboard: React.FC = () => {
                 className="text-purple-600 hover:text-purple-700 font-medium underline"
               >
                 新しい投稿を生成する
+              </button>
+              <span className="mx-2 text-gray-400">|</span>
+              <button
+                onClick={handleBackToSalonInfo}
+                className="text-purple-600 hover:text-purple-700 font-medium underline"
+              >
+                店舗情報を編集
               </button>
             </div>
 

@@ -42,8 +42,7 @@ export interface GenerationRequest {
   context: string;
   channels: string[];
   tone: string;
-  hints: string;
-  ask_ai: string;
+  topic_suggestion: string;
 }
 
 export interface GeneratedOutput {

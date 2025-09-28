@@ -36,6 +36,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
 
       if ('user_id' in response && 'email' in response) {
         setDebugInfo('ログイン成功、ユーザー情報を設定中...');
+        
+        // Cookieの確認
+        setTimeout(() => {
+          const cookies = document.cookie;
+          console.log('🍪 Current cookies:', cookies);
+          setDebugInfo(prev => prev + `\n\nCookies確認: ${cookies || 'No cookies found'}`);
+        }, 1000);
+        
         login({
           user_id: response.user_id,
           email: response.email,
