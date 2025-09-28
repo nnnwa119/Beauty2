@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
 import { Card } from '../ui/Card';
 import { GeneratedResult } from '../../types';
 import { apiClient } from '../../utils/api';
 import { ArrowLeft } from 'lucide-react';
 
-interface GenerationFormProps {
+interface PostGenerationFormProps {
+  generatedTopic: string;
   onGenerate: (results: GeneratedResult[]) => void;
-  onBackToSalonInfo: () => void;
+  onBackToTopicGeneration: () => void;
 }
 
 const CHANNELS = [
@@ -25,21 +25,13 @@ const TONES = [
   { id: 'elegant', name: 'エレガント', description: '上品で洗練された印象' },
 ];
 
-const TOPIC_SUGGESTIONS = [
-  { id: 'seasonal', name: '季節ネタ' },
-  { id: 'current_events', name: '時事ネタ' },
-  { id: 'trend', name: 'トレンド' },
-  { id: 'middle_aged', name: '中年向け' },
-  { id: 'elderly', name: '年配向け' },
-  { id: 'salon_pr', name: '店舗PR重視' },
-  { id: 'daily_talk', name: '日常呟き' },
-];
-
-export const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, onBackToSalonInfo }) => {
-  const [context, setContext] = useState('');
+export const PostGenerationForm: React.FC<PostGenerationFormProps> = ({ 
+  generatedTopic, 
+  onGenerate, 
+  onBackToTopicGeneration 
+}) => {
   const [selectedChannels, setSelectedChannels] = useState<string[]>(['instagram']);
   const [selectedTone, setSelectedTone] = useState('friendly');
-  const [selectedTopicSuggestion, setSelectedTopicSuggestion] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleChannelChange = (channelId: string) => {
@@ -50,32 +42,26 @@ export const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, onBa
     );
   };
 
-  const handleTopicSuggestionChange = (topicId: string) => {
-    setSelectedTopicSuggestion(prev => prev === topicId ? '' : topicId);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (selectedChannels.length === 0 || !context.trim()) {
+    if (selectedChannels.length === 0) {
       return;
     }
     
     setIsGenerating(true);
 
     try {
-      console.log('🎨 Generating posts with params:', {
-        context,
+      console.log('📝 Generating posts with params:', {
+        gen_context: generatedTopic,
         channels: selectedChannels,
         tone: selectedTone,
-        topic_suggestion: selectedTopicSuggestion,
       });
 
       const response = await apiClient.generatePosts({
-        context,
+        gen_context: generatedTopic,
         channels: selectedChannels,
         tone: selectedTone,
-        topic_suggestion: selectedTopicSuggestion,
       });
       
       if (response.results) {
@@ -99,12 +85,8 @@ export const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, onBa
             errorMessage = `生成失敗: ${errorData.response.data.message}`;
           } else if (errorData.response?.status === 401) {
             errorMessage = '認証エラー: ログインし直してください';
-          } else if (errorData.response?.status === 403) {
-            errorMessage = 'アクセス権限がありません';
           } else if (errorData.response?.status >= 500) {
             errorMessage = `サーバーエラー (${errorData.response.status}): サーバーで問題が発生しました`;
-          } else if (errorData.response?.status) {
-            errorMessage = `サーバーエラー (${errorData.response.status}): ${errorData.response.statusText}`;
           } else if (errorData.error === 'Network Error') {
             errorMessage = `ネットワークエラー: ${errorData.message}`;
           }
@@ -114,7 +96,6 @@ export const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, onBa
         }
       }
       
-      // より詳細なエラー表示
       const fullErrorMessage = debugInfo 
         ? `${errorMessage}\n\nデバッグ情報:\n${debugInfo}`
         : errorMessage;
@@ -127,7 +108,7 @@ export const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, onBa
         return {
           channel: channelId,
           outputs: [{
-            text: `【${channel?.name}用投稿 - テストモード】\n\n${context}\n\n※ APIエラーのため、モックデータを表示しています。`,
+            text: `【${channel?.name}用投稿 - テストモード】\n\n${generatedTopic}\n\n※ APIエラーのため、モックデータを表示しています。`,
             hashtags: channelId === 'instagram' ? ['#美容室', '#ヘアサロン', '#スタイル'] : undefined
           }]
         };
@@ -144,72 +125,27 @@ export const GenerationForm: React.FC<GenerationFormProps> = ({ onGenerate, onBa
         <Button
           variant="outline"
           size="sm"
-          onClick={onBackToSalonInfo}
+          onClick={onBackToTopicGeneration}
           className="mb-4"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          店舗情報を編集
+          投稿ネタを編集
         </Button>
       </div>
       
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">投稿を生成</h2>
-        <p className="text-gray-600">SNS投稿の内容を設定して、自動で投稿文を生成しましょう</p>
+        <p className="text-gray-600">生成されたネタを各チャネル・トーンに合わせて投稿文を作成します</p>
+      </div>
+
+      <div className="mb-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">生成されたネタ</h3>
+        <div className="bg-gray-50 rounded-lg p-4">
+          <p className="text-gray-800 whitespace-pre-wrap">{generatedTopic}</p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="context" className="block text-sm font-medium text-gray-700 mb-2">
-            投稿したいこと、素案
-          </label>
-          <textarea
-            id="context"
-            value={context}
-            onChange={(e) => setContext(e.target.value)}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-            placeholder="例: 新しいヘアカラーのキャンペーンを開始します。春らしいピンクベージュが人気です。"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            投稿ネタに困ったら
-          </label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {TOPIC_SUGGESTIONS.map(topic => (
-              <div key={topic.id} className="relative">
-                <label className="flex items-start p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                  <input
-                    type="radio"
-                    name="topic_suggestion"
-                    className="mt-1 mr-3"
-                    checked={selectedTopicSuggestion === topic.id}
-                    onChange={() => setSelectedTopicSuggestion(topic.id)}
-                  />
-                  <div>
-                    <div className="font-medium text-gray-900">{topic.name}</div>
-                  </div>
-                </label>
-              </div>
-            ))}
-            <div className="relative">
-              <label className="flex items-start p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                <input
-                  type="radio"
-                  name="topic_suggestion"
-                  className="mt-1 mr-3"
-                  checked={selectedTopicSuggestion === ''}
-                  onChange={() => setSelectedTopicSuggestion('')}
-                />
-                <div>
-                  <div className="font-medium text-gray-900">選択しない</div>
-                </div>
-              </label>
-            </div>
-          </div>
-        </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">
             投稿するチャネル <span className="text-red-500">*</span>

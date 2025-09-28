@@ -38,11 +38,22 @@ export interface SalonResponse {
   created_at: string;
 }
 
-export interface GenerationRequest {
+export interface TopicGenerationRequest {
   context: string;
+  topic_suggestion: string;
+}
+
+export interface TopicGenerationResponse {
+  context?: string;
+  topic_suggestion?: string;
+  error?: string;
+  message?: string;
+}
+
+export interface PostGenerationRequest {
+  gen_context: string;
   channels: string[];
   tone: string;
-  topic_suggestion: string;
 }
 
 export interface GeneratedOutput {

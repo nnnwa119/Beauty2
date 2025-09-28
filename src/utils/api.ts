@@ -138,10 +138,15 @@ class ApiClient {
     });
   }
 
-  async generatePosts(params: { context: string; channels: string[]; tone: string; hints: string; ask_ai: string }) {
+  async generateTopic(params: { context: string; topic_suggestion: string }) {
+    return this.request('/generate-topic', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    }, 30000); // 30秒のタイムアウト
   }
-  async generatePosts(params: { context: string; channels: string[]; tone: string; topic_suggestion: string }) {
-    return this.request('/generate', {
+
+  async generatePosts(params: { gen_context: string; channels: string[]; tone: string }) {
+    return this.request('/generate-posts', {
       method: 'POST',
       body: JSON.stringify(params),
     }, 60000); // 60秒のタイムアウト

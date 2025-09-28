@@ -7,14 +7,20 @@ import { GeneratedResult } from '../../types';
 import { Sparkles } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
-  const [step, setStep] = useState<'salon-info' | 'generation' | 'results'>('salon-info');
+  const [step, setStep] = useState<'salon-info' | 'topic-generation' | 'post-generation' | 'results'>('salon-info');
   const [generatedResults, setGeneratedResults] = useState<GeneratedResult[]>([]);
+  const [generatedTopic, setGeneratedTopic] = useState<string>('');
 
   const handleSalonInfoComplete = () => {
-    setStep('generation');
+    setStep('topic-generation');
   };
 
-  const handleGeneration = (results: GeneratedResult[]) => {
+  const handleTopicGeneration = (topic: string) => {
+    setGeneratedTopic(topic);
+    setStep('post-generation');
+  };
+
+  const handlePostGeneration = (results: GeneratedResult[]) => {
     setGeneratedResults(results);
     setStep('results');
   };
@@ -29,8 +35,12 @@ export const Dashboard: React.FC = () => {
     );
   };
 
-  const handleNewGeneration = () => {
-    setStep('generation');
+  const handleNewTopicGeneration = () => {
+    setStep('topic-generation');
+  };
+
+  const handleBackToTopicGeneration = () => {
+    setStep('topic-generation');
   };
 
   const handleBackToSalonInfo = () => {
@@ -46,11 +56,21 @@ export const Dashboard: React.FC = () => {
           <SalonInfoForm onComplete={handleSalonInfoComplete} />
         )}
 
-        {step === 'generation' && (
+        {step === 'topic-generation' && (
           <div className="max-w-4xl mx-auto px-4">
-            <GenerationForm 
-              onGenerate={handleGeneration} 
+            <TopicGenerationForm 
+              onGenerate={handleTopicGeneration} 
               onBackToSalonInfo={handleBackToSalonInfo}
+            />
+          </div>
+        )}
+
+        {step === 'post-generation' && (
+          <div className="max-w-4xl mx-auto px-4">
+            <PostGenerationForm 
+              generatedTopic={generatedTopic}
+              onGenerate={handlePostGeneration}
+              onBackToTopicGeneration={handleBackToTopicGeneration}
             />
           </div>
         )}
@@ -68,10 +88,10 @@ export const Dashboard: React.FC = () => {
                 各チャネル向けに最適化された投稿内容をご確認ください
               </p>
               <button
-                onClick={handleNewGeneration}
+                onClick={handleNewTopicGeneration}
                 className="text-purple-600 hover:text-purple-700 font-medium underline"
               >
-                新しい投稿を生成する
+                新しいネタを生成する
               </button>
               <span className="mx-2 text-gray-400">|</span>
               <button
