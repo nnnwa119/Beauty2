@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { apiClient } from '../../utils/api';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Edit2, Check } from 'lucide-react';
 
 interface TopicGenerationFormProps {
   onGenerate: (topic: string) => void;
@@ -10,19 +10,28 @@ interface TopicGenerationFormProps {
 }
 
 const TOPIC_SUGGESTIONS = [
-  { id: 'seasonal', name: '季節ネタ' },
-  { id: 'current_events', name: '時事ネタ' },
-  { id: 'trend', name: 'トレンド' },
-  { id: 'middle_aged', name: '中年向け' },
-  { id: 'elderly', name: '年配向け' },
-  { id: 'salon_pr', name: '店舗PR重視' },
-  { id: 'daily_talk', name: '日常呟き' },
+  { id: 'seasonal', name: '季節ネタ', description: '春夏秋冬の季節に合わせた投稿' },
+  { id: 'current_events', name: '時事ネタ', description: '最新のニュースや話題を取り入れた投稿' },
+  { id: 'trend', name: 'トレンド', description: '流行のヘアスタイルや美容トレンド' },
+  { id: 'middle_aged', name: '中年向け', description: '30-50代のお客様に向けた投稿' },
+  { id: 'elderly', name: '年配向け', description: '50代以上のお客様に向けた投稿' },
+  { id: 'salon_pr', name: '店舗PR重視', description: 'サロンの魅力や特徴をアピール' },
+  { id: 'daily_talk', name: '日常呟き', description: 'カジュアルで親しみやすい日常の話題' },
 ];
+
+interface TopicResult {
+  context: string;
+}
 
 export const TopicGenerationForm: React.FC<TopicGenerationFormProps> = ({ onGenerate, onBackToSalonInfo }) => {
   const [context, setContext] = useState('');
   const [selectedTopicSuggestion, setSelectedTopicSuggestion] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedTopics, setGeneratedTopics] = useState<TopicResult[]>([]);
+  const [selectedTopicIndex, setSelectedTopicIndex] = useState(0);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingText, setEditingText] = useState('');
+  const [showResults, setShowResults] = useState(false);
 
   const handleTopicSuggestionChange = (topicId: string) => {
     setSelectedTopicSuggestion(prev => prev === topicId ? '' : topicId);
@@ -44,9 +53,11 @@ export const TopicGenerationForm: React.FC<TopicGenerationFormProps> = ({ onGene
         topic_suggestion: selectedTopicSuggestion,
       });
       
-      if (response.context) {
-        console.log('✅ Topic generated successfully:', response.context);
-        onGenerate(response.context);
+      if (response.results && response.results.length > 0) {
+        console.log('✅ Topics generated successfully:', response.results);
+        setGeneratedTopics(response.results);
+        setSelectedTopicIndex(0); // デフォルトで1番目を選択
+        setShowResults(true);
       } else {
         throw new Error('投稿ネタの生成に失敗しました');
       }
@@ -83,12 +94,137 @@ export const TopicGenerationForm: React.FC<TopicGenerationFormProps> = ({ onGene
       alert(fullErrorMessage);
       
       // エラー時はモックデータで代用（開発用）
-      const mockTopic = `【テストモード】${context || '投稿ネタを生成しました'}\n\n※ APIエラーのため、モックデータを表示しています。`;
-      onGenerate(mockTopic);
+      const mockTopics: TopicResult[] = [
+        { context: `【テストモード1】${context || '投稿ネタを生成しました'}\n\n※ APIエラーのため、モックデータを表示しています。` },
+        { context: `【テストモード2】別のアプローチでの投稿ネタです。` },
+        { context: `【テストモード3】さらに違った角度からの投稿ネタです。` },
+      ];
+      setGeneratedTopics(mockTopics);
+      setSelectedTopicIndex(0);
+      setShowResults(true);
     } finally {
       setIsGenerating(false);
     }
   };
+
+  const handleEditStart = (index: number) => {
+    setEditingIndex(index);
+    setEditingText(generatedTopics[index].context);
+  };
+
+  const handleEditSave = () => {
+    if (editingIndex !== null) {
+      const updatedTopics = [...generatedTopics];
+      updatedTopics[editingIndex] = { context: editingText };
+      setGeneratedTopics(updatedTopics);
+      setEditingIndex(null);
+      setEditingText('');
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditingIndex(null);
+    setEditingText('');
+  };
+
+  const handleProceedToPostGeneration = () => {
+    const selectedTopic = generatedTopics[selectedTopicIndex];
+    onGenerate(selectedTopic.context);
+  };
+
+  const handleBackToForm = () => {
+    setShowResults(false);
+    setGeneratedTopics([]);
+    setSelectedTopicIndex(0);
+  };
+
+  if (showResults) {
+    return (
+      <Card className="w-full max-w-4xl mx-auto">
+        <div className="mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleBackToForm}
+            className="mb-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            条件を変更
+          </Button>
+        </div>
+        
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">投稿ネタが生成されました</h2>
+          <p className="text-gray-600">お気に入りのネタを選択して、必要に応じて編集してください</p>
+        </div>
+
+        <div className="space-y-4 mb-6">
+          {generatedTopics.map((topic, index) => (
+            <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    name="selectedTopic"
+                    checked={selectedTopicIndex === index}
+                    onChange={() => setSelectedTopicIndex(index)}
+                    className="mr-3 mt-1"
+                  />
+                  <h3 className="text-lg font-medium text-gray-900">
+                    ネタ {index + 1}
+                  </h3>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEditStart(index)}
+                  disabled={editingIndex === index}
+                >
+                  <Edit2 className="w-4 h-4 mr-1" />
+                  編集
+                </Button>
+              </div>
+
+              {editingIndex === index ? (
+                <div className="space-y-3">
+                  <textarea
+                    value={editingText}
+                    onChange={(e) => setEditingText(e.target.value)}
+                    rows={6}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm"
+                  />
+                  <div className="flex space-x-2">
+                    <Button size="sm" onClick={handleEditSave}>
+                      <Check className="w-4 h-4 mr-1" />
+                      保存
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleEditCancel}>
+                      キャンセル
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className={`bg-gray-50 rounded-lg p-4 ${selectedTopicIndex === index ? 'ring-2 ring-purple-500' : ''}`}>
+                  <pre className="whitespace-pre-wrap text-sm text-gray-800">
+                    {topic.context}
+                  </pre>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <Button
+          onClick={handleProceedToPostGeneration}
+          className="w-full"
+          size="lg"
+          disabled={editingIndex !== null}
+        >
+          選択したネタで投稿を生成する
+        </Button>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
@@ -141,6 +277,7 @@ export const TopicGenerationForm: React.FC<TopicGenerationFormProps> = ({ onGene
                   />
                   <div>
                     <div className="font-medium text-gray-900">{topic.name}</div>
+                    <div className="text-sm text-gray-600">{topic.description}</div>
                   </div>
                 </label>
               </div>

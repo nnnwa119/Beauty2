@@ -44,8 +44,9 @@ export interface TopicGenerationRequest {
 }
 
 export interface TopicGenerationResponse {
-  context?: string;
-  topic_suggestion?: string;
+  results?: Array<{
+    context: string;
+  }>;
   error?: string;
   message?: string;
 }
