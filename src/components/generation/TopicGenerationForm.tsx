@@ -20,6 +20,7 @@ const TOPIC_SUGGESTIONS = [
 ];
 
 interface TopicResult {
+  summary: string;
   context: string;
 }
 
@@ -95,9 +96,18 @@ export const TopicGenerationForm: React.FC<TopicGenerationFormProps> = ({ onGene
       
       // エラー時はモックデータで代用（開発用）
       const mockTopics: TopicResult[] = [
-        { context: `【テストモード1】${context || '投稿ネタを生成しました'}\n\n※ APIエラーのため、モックデータを表示しています。` },
-        { context: `【テストモード2】別のアプローチでの投稿ネタです。` },
-        { context: `【テストモード3】さらに違った角度からの投稿ネタです。` },
+        { 
+          summary: "秋のヘアカラー提案",
+          context: `【テストモード1】${context || '投稿ネタを生成しました'}\n\n※ APIエラーのため、モックデータを表示しています。` 
+        },
+        { 
+          summary: "乾燥対策ヘアケア",
+          context: `【テストモード2】別のアプローチでの投稿ネタです。` 
+        },
+        { 
+          summary: "トレンドカット",
+          context: `【テストモード3】さらに違った角度からの投稿ネタです。` 
+        },
       ];
       setGeneratedTopics(mockTopics);
       setSelectedTopicIndex(0);
@@ -170,9 +180,12 @@ export const TopicGenerationForm: React.FC<TopicGenerationFormProps> = ({ onGene
                     onChange={() => setSelectedTopicIndex(index)}
                     className="mr-3 mt-1"
                   />
-                  <h3 className="text-lg font-medium text-gray-900">
-                    ネタ {index + 1}
-                  </h3>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      {topic.summary}
+                    </h3>
+                    <p className="text-sm text-gray-500">ネタ {index + 1}</p>
+                  </div>
                 </div>
                 <Button
                   variant="outline"

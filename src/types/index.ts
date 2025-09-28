@@ -45,6 +45,7 @@ export interface TopicGenerationRequest {
 
 export interface TopicGenerationResponse {
   results?: Array<{
+    summary: string;
     context: string;
   }>;
   error?: string;
