@@ -137,7 +137,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
           <button
             type="button"
             onClick={onSwitchToSignup}
-            className="text-purple-600 hover:text-purple-700 font-medium underline"
+            className="text-orange-600 hover:text-orange-700 font-medium underline"
           >
             新規登録
           </button>

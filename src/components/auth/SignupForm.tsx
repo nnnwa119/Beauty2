@@ -160,7 +160,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
           <button
             type="button"
             onClick={onSwitchToLogin}
-            className="text-purple-600 hover:text-purple-700 font-medium underline"
+            className="text-orange-600 hover:text-orange-700 font-medium underline"
           >
             ログイン
           </button>

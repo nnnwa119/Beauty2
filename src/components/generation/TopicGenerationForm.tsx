@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { apiClient } from '../../utils/api';
-import { ArrowLeft, Edit2, Check } from 'lucide-react';
+import { ArrowLeft, CreditCard as Edit2, Check } from 'lucide-react';
 
 interface TopicGenerationFormProps {
   onGenerate: (topic: string) => void;
@@ -184,7 +184,6 @@ export const TopicGenerationForm: React.FC<TopicGenerationFormProps> = ({ onGene
                     <h3 className="text-lg font-medium text-gray-900">
                       {topic.summary}
                     </h3>
-                    <p className="text-sm text-gray-500">ネタ {index + 1}</p>
                   </div>
                 </div>
                 <Button
